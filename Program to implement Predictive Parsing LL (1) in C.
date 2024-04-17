@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <ctype.h>
+#include <stdbool.h>
+#include <string.h>
+
+// Function prototypes
+void E();
+void T();
+void F();
+void match(char);
+
+// Input string
+char input[100];
+// Current position in the input string
+int position = 0;
+// Flag to track parsing success
+bool success = true;
+
+// Function to match the current input symbol with the expected symbol
+void match(char expected) {
+    if (input[position] == expected) {
+        position++;
+    } else {
+        success = false;
+    }
+}
+
+// Function to parse E non-terminal
+void E() {
+    T();
+    if (input[position] == '+') {
+        match('+');
+        E();
+    }
+}
+
+// Function to parse T non-terminal
+void T() {
+    F();
+    if (input[position] == '*') {
+        match('*');
+        T();
+    }
+}
+
+// Function to parse F non-terminal
+void F() {
+    if (isdigit(input[position])) {
+        // Terminal symbol is a digit
+        position++;
+    } else if (input[position] == '(') {
+        // Terminal symbol is '('
+        match('(');
+        E();
+        match(')');
+    } else {
+        // Invalid input
+        success = false;
+    }
+}
+
+int main() {
+    printf("Enter an arithmetic expression: ");
+    scanf("%s", input);
+
+    // Start parsing from the E non-terminal
+    E();
+
+    // Check if parsing was successful and if we have reached the end of the input
+    if (success && input[position] == '\0') {
+        printf("Parsing successful.\n");
+    } else {
+        printf("Parsing failed.\n");
+    }
+
+    return 0;
+}
