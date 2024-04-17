@@ -1,0 +1,71 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <ctype.h>
+
+// Function prototypes
+int precedence(char);
+void error();
+void parse_expression();
+
+// Input string
+char input[100];
+// Current position in the input string
+int position = 0;
+// Flag to track parsing success
+bool success = true;
+
+// Function to get precedence of an operator
+int precedence(char op) {
+    switch(op) {
+        case '+':
+        case '-':
+            return 1;
+        case '*':
+        case '/':
+            return 2;
+        default:
+            return 0;
+    }
+}
+
+// Function to handle syntax errors
+void error() {
+    printf("Syntax error at position %d\n", position);
+    success = false;
+}
+
+// Function to parse expression
+void parse_expression() {
+    char stack[100];
+    int top = -1;
+    stack[++top] = '$'; // Bottom of stack
+
+    while (input[position] != '\0') {
+        if (isalnum(input[position])) {
+            printf("%c", input[position++]);
+        } else {
+            if (precedence(stack[top]) >= precedence(input[position])) {
+                printf("%c", stack[top--]);
+            } else {
+                stack[++top] = input[position++];
+            }
+        }
+    }
+
+    while (stack[top] != '$') {
+        printf("%c", stack[top--]);
+    }
+}
+
+int main() {
+    printf("Enter an arithmetic expression: ");
+    scanf("%s", input);
+
+    printf("Postfix expression: ");
+    parse_expression();
+
+    printf("\n");
+
+    return 0;
+}
