@@ -1,0 +1,78 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <stdbool.h>
+#include <ctype.h>
+
+// Function prototypes
+void expression();
+void term();
+void factor();
+void error();
+
+// Input string
+char input[100];
+// Current position in the input string
+int position = 0;
+// Flag to track parsing success
+bool success = true;
+
+// Function to parse E -> E + T | T
+void expression() {
+    term();
+    while (input[position] == '+') {
+        position++;
+        term();
+    }
+}
+
+// Function to parse T -> T * F | F
+void term() {
+    factor();
+    while (input[position] == '*') {
+        position++;
+        factor();
+    }
+}
+
+// Function to parse F -> (E) | id
+void factor() {
+    if (isdigit(input[position])) {
+        // Terminal symbol is a digit
+        position++;
+    } else if (input[position] == '(') {
+        // Terminal symbol is '('
+        position++;
+        expression();
+        if (input[position] == ')') {
+            position++;
+        } else {
+            error();
+        }
+    } else {
+        // Invalid input
+        error();
+    }
+}
+
+// Function to handle syntax errors
+void error() {
+    printf("Syntax error at position %d\n", position);
+    success = false;
+}
+
+int main() {
+    printf("Enter an arithmetic expression: ");
+    scanf("%s", input);
+
+    // Start parsing from the expression non-terminal
+    expression();
+
+    // Check if parsing was successful and if we have reached the end of the input
+    if (success && input[position] == '\0') {
+        printf("Parsing successful.\n");
+    } else {
+        printf("Parsing failed.\n");
+    }
+
+    return 0;
+}
